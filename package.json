@@ -1,0 +1,15 @@
+{
+  "name": "xls-tool",
+  "version": "1.0.0",
+  "description": "xls file export to ts/js/c#/csv/xml/.etc",
+  "main": "app/client-js/electron-app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "electron:dev": "tsc && electron app/client-js/electron-app.js",
+    "electron:build": "tsc && electron-builder",
+    "electron:build:debug": "DEBUG=electron-builder electron-builder"
+  },
+  "author": "惊仙",
+  "license": "ISC"
+}

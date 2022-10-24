@@ -1,0 +1,214 @@
+
+let {{ record_name }} = {};
+
+{% for item in needColumnsData %}
+{{ record_name}}.{{item.column}} = {%if item.type == "int" %}0{% else %} ""{% endif %} ;//{{ item.desc }}
+{%- endfor %}
+
+let __data = [ {% for row in rowsData %}  
+    [ {%- for k,v in row %}{{ v }},{% endfor -%} ],
+   {%- endfor %}
+]
+
+let __index_{{ indexOfColumns | join("_") }} = { {% for k, v in indexData %}  
+    "{{ k}}" : {{v}},
+{%- endfor %}
+}
+
+let __key_map = { {% for item in needColumnsData %}
+    "{{item.column}}" : {{ loop.index-1 }},
+{%- endfor %}
+}
+
+let {{ class_name }} = {}
+
+{% if enumStrDict %}
+{{ class_name }}.{{ enumStrDict.name }} = {
+{%- for item in enumStrDict.list %}{% if item %}
+        {{item}} : {{loop.index-1}},{% endif %}
+{%- endfor %}
+}
+{% endif %}
+
+{% if enumNumDict %}
+{{ class_name }}.{{ enumNumDict.name }} = {
+{%- for item in enumNumDict.list %}{% if item %}
+        {{item}} : {{loop.index-1}},{% endif %}
+{%- endfor %}
+}
+{% endif %}
+
+{% if enums %}
+{% for item in enums %}
+{{ class_name }}.{{item.name}} = {
+    {%- for unit in item.units %}
+    {{unit}}
+    {%- endfor %}
+}
+{% endfor %}
+{% endif %}
+
+{% if key_counts %}
+{% for item in key_counts %}
+{{ class_name }}.{{item.name}} = {{item.value}}
+{% endfor %}
+{% endif %}
+
+{% if sub_classes %}
+{% for subclassString, subclassArr in sub_classes %}
+{{ class_name }}.class_{{subclassString}} = {
+    {%- for class in subclassArr %}
+    "{{class.key}}": [{{class.value}}], 
+    {%- endfor %}
+}
+{% endfor %}
+
+{% for subclassString, subclassArr in sub_classes %}
+{{ class_name }}.{{subclassString}} = "{{subclassString}}"
+{% endfor %}
+
+
+{{ class_name }}.getList = function(key, value) {
+    return {{class_name}}["class_" + key][value] || []
+}
+{% endif %}
+
+
+{{ class_name }}.getLength = function() {
+    return __data.length;
+}
+
+
+{{ class_name }}.hasKey = function(k) {
+    if (__key_map[k] != null) {
+        return true;
+    }
+    return false;
+}
+
+
+{{ class_name }}.indexOf = function(index) {
+    if (index == null) {
+        return null
+    }
+    let raw = __data[index]
+    if (raw == null) {
+        return null
+    }
+    let record = {}
+    for (let key in __key_map) {
+        record[key] = raw[__key_map[key] ]
+    }
+    return record
+}
+
+
+{{ class_name }}.getSafe = function({{ indexOfColumns | join(", ") }}) {
+    {% if indexOfColumns.length == 1 %}
+    let ret = {{ class_name }}.indexOf(__index_{{ indexOfColumns | join("_") }}[ {{ indexOfColumns | join(",") }} ])
+    if (!ret) {
+        throw new Error(`{{ class_name }} {{ indexOfColumns | join("_") }} ${ {{ indexOfColumns | join(",") }} } value is null`)
+    }
+    {% else %}
+    let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+    let ret =  {{ class_name }}.indexOf(__index_{{ indexOfColumns | join("_") }}[k])
+    if (!ret) {
+        throw new Error(`{{ class_name }} {{ indexOfColumns | join("_") }} ${k} value is null`)
+    }
+    {% endif %} 
+    return ret
+}
+
+
+{{ class_name }}.get = function({{ indexOfColumns | join(",") }}) {
+    {% if indexOfColumns.length == 1 %}
+    return {{ class_name }}.indexOf(__index_{{ indexOfColumns | join("_") }}[ {{ indexOfColumns | join(",") }} ])
+    {% else %}
+    let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+    return {{ class_name }}.indexOf(__index_{{ indexOfColumns | join("_") }}[k])
+    {% endif %} 
+}
+
+{{ class_name }}.rowCfgIsExist = function({{ indexOfColumns | join(",") }}) {
+    {% if indexOfColumns.length == 1 %}
+    let k = {{ indexOfColumns | join(",") }}
+    {% else %}
+    let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+    {% endif %} 
+    let rowCfg = {{ class_name }}._getRowCfgByKey(k)
+    if(!!rowCfg) {
+        return true
+    }
+    return false
+}
+
+{{ class_name }}._getRowCfgByKey = function(key) {
+    let index = __index_{{ indexOfColumns | join("_") }}[key]
+    let rowCfg = __data[index]
+    if(!rowCfg) {
+        return null
+    }
+    return rowCfg
+}
+
+{{ class_name }}._getRowCfgByIdx = function(index) {
+    let rowCfg = __data[index]
+    if (!rowCfg) {
+        return null
+    }
+    return rowCfg
+}
+
+{% if enumStrDict %}
+{{ class_name }}.getStringByKey = function({{ indexOfColumns | join(", ") }}, valueIdx) {
+    {% if indexOfColumns.length == 1 %}
+    let k = {{ indexOfColumns | join(",") }}
+    {% else %}
+    let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+    {% endif %} 
+    let rowCfg = {{ class_name }}._getRowCfgByKey(k)
+    if(!rowCfg) {
+        return null
+    }
+    return rowCfg[valueIdx]
+}
+
+{{ class_name }}.getStringByIdx = function(index, valueIdx) {
+    if (index == null) {
+        return null
+    }
+    let rowCfg = {{ class_name }}._getRowCfgByIdx(index)
+    if (rowCfg == null) {
+        return null
+    }
+    return rowCfg[valueIdx]
+}
+{% endif %}
+
+{% if enumNumDict %}
+{{ class_name }}.getNumberByKey = function({{ indexOfColumns | join(", ") }}, valueIdx) {
+    {% if indexOfColumns.length == 1 %}
+    let k = {{ indexOfColumns | join(",") }}
+    {% else %}
+    let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+    {% endif %} 
+    let rowCfg = {{ class_name }}._getRowCfgByKey(k)
+    if(!rowCfg) {
+        return null
+    }
+    return rowCfg[valueIdx]
+}
+
+{{ class_name }}.getNumberByIdx = function(index, valueIdx) {
+    if (index == null) {
+        return null
+    }
+    let rowCfg = {{ class_name }}._getRowCfgByIdx(index)
+    if (rowCfg == null) {
+        return null
+    }
+    return rowCfg[valueIdx]
+}
+{% endif %}
+
+module.exports = {{ class_name }}

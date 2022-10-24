@@ -1,0 +1,51 @@
+[
+  {
+    "$$hashKey": "object:3",
+    "dir": "E:\\work\\Svn\\tools\\xlsxexporter\\test",
+    "need": true,
+    "reg": "Client|Both|Lua",
+    "text": "lua"
+  },
+  {
+    "$$hashKey": "object:4",
+    "dir": "E:\\work\\Svn\\tools\\xlsxexporter\\test",
+    "need": true,
+    "reg": "Server|Both|Xml",
+    "text": "xml"
+  },
+  {
+    "$$hashKey": "object:5",
+    "dir": "",
+    "need": false,
+    "reg": "Client|Both|Csv",
+    "text": "csv"
+  },
+  {
+    "$$hashKey": "object:6",
+    "dir": "",
+    "need": false,
+    "reg": "Client|Both|Js",
+    "text": "js"
+  },
+  {
+    "$$hashKey": "object:7",
+    "dir": "E:\\work\\Svn\\tools\\xlsxexporter\\test",
+    "need": true,
+    "reg": "Client|Both|Ts",
+    "text": "ts"
+  },
+  {
+    "$$hashKey": "object:8",
+    "dir": "",
+    "need": false,
+    "reg": "Client|Both|C#",
+    "text": "c#"
+  },
+  {
+    "$$hashKey": "object:9",
+    "dir": "",
+    "need": false,
+    "reg": "Client|Server|Both|ts",
+    "text": "gm"
+  }
+]

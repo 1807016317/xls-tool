@@ -1,0 +1,227 @@
+export interface {{ record_name }} {
+{%- for item in needColumnsData %}
+    {{item.column}} : {%if item.type == "int" %}number{% else %} string{% endif %} ,//{{ item.desc }}
+{%- endfor %}
+}
+
+{% if enumStrDict %}
+export enum {{ enumStrDict.name }} {
+{%- for item in enumStrDict.list %}{% if item %}
+        {{item}} = {{loop.index-1}},{% endif %}
+{%- endfor %}
+}
+{% endif %}
+
+{% if enumNumDict %}
+export enum {{ enumNumDict.name }} {
+{%- for item in enumNumDict.list %}{% if item %}
+        {{item}} = {{loop.index-1}},{% endif %}
+{%- endfor %}
+}
+{% endif %}
+
+export default class {{ class_name }}   {
+    {% if defaultValueList %}private static __default_value_list = [{% for defaultValue in defaultValueList %}{{defaultValue}}, {%- endfor %}]{% endif %}
+    private static _fconfig = null
+
+    private static __data = [ {% for row in rowsData %}  
+        [ {%- for v in row %}{{ v }},{% endfor -%} ],
+       {%- endfor %}
+    ]
+
+    private static  __index_{{ indexOfColumns | join("_") }} = { {% for k, v in indexData %}  
+        "{{ k}}" : {{v}},
+    {%- endfor %}
+    }
+    
+    {% if defaultValueList %}private static __key_list = [ {% for item in needColumnsData %}
+        "{{item.column}}",
+    {%- endfor %}
+    ]{% else %}
+    private static __key_map = { {% for item in needColumnsData %}
+        "{{item.column}}" : {{ loop.index-1 }},
+    {%- endfor %}
+    }{% endif %}
+
+    private static __data_len = {{rowsData.length}}
+
+    {% if enums %}
+    {% for item in enums %}
+    public static {{item.name}} = {
+        {%- for unit in item.units %}
+        {{unit}}
+        {%- endfor %}
+    }
+    {% endfor %}
+    {% endif %}
+
+    {% if key_counts %}
+    {% for item in key_counts %}
+    public static {{item.name}} = {{item.value}}
+    {% endfor %}
+    {% endif %}
+
+    {% if sub_classes %}
+    {% for subclassString, subclassArr in sub_classes %}
+    private static class_{{subclassString}} = {
+        {%- for class in subclassArr %}
+        "{{class.key}}": [{{class.value}}], 
+        {%- endfor %}
+    }
+    {% endfor %}
+
+    {% for subclassString, subclassArr in sub_classes %}
+    public static {{subclassString}}: string = "{{subclassString}}"
+    {% endfor %}
+
+    {% if extraDictName %}
+    public static {{extraDictName}} = {{extraDict}}
+    {% endif %}
+
+    {% if keyTypeList.length > 1 %}
+    public static getList(key: string, value: number | string): [{{ keyTypeList | join(", ") }}][] {
+        return {{class_name}}["class_" + key][value] || []
+    }
+    {% endif %}
+    {% if keyTypeList.length === 1 %}
+    public static getList(key: string, value: number | string): {{keyTypeList}}[] {
+        return {{class_name}}["class_" + key][value] || []
+    }
+    {% endif %}
+
+    public static getListLen(key: string): number {
+        let dict = {{class_name}}["class_" + key]
+        return Object.keys(dict).length || 0
+    }
+    {% endif %}
+    private static _getIndexLength(index: number) {
+        if ({{class_name}}.__data) {
+            let rowCfg = {{class_name}}.__data[index]
+            if (!rowCfg) {
+                return 0
+            }
+            return rowCfg.length
+        }
+        else {
+            let farray = this._fconfig._data(index)
+            return farray.aLength()
+        }
+    }
+
+    private static _getColValueByIdx(index: number, col: number): (string | number) {
+        if(!configMgr && !!{{class_name}}.__data) {
+            let rowCfg = {{class_name}}.__data[index]
+            if (!rowCfg) {
+                return null
+            }
+            return rowCfg.length <= col ? {{class_name}}.__default_value_list[col] : rowCfg[col]
+        }
+        return configMgr.getConfigValue(this._fconfig, index, col, {{class_name}}.__default_value_list, {{class_name}}.__data)
+    }
+
+    public static getLength():number {
+        return {{ class_name }}.__data_len;
+    }
+
+    public static hasKey(k: string): boolean{
+        if ({{ class_name }}.__key_list.indexOf(k) != -1) {
+            return true
+        }
+        return false
+    }
+
+    public static indexOf(index: number, cfg?: {{ record_name }} | Readonly<{{ record_name }}>): Readonly<{{ record_name }}>  {
+        if (index == null) {
+            return null
+        }
+        if ({{class_name}}.__data_len <= index) {
+            return null
+        }
+        let key = ""
+        let record = cfg || {} as record_{{class_name}}
+        let len = {{class_name}}.__key_list.length
+        let idxLen = {{class_name}}._getIndexLength(index)
+        let idx = 0;
+        for(; idx < idxLen; idx++) {
+            key = {{class_name}}.__key_list[idx]
+            record[key] = {{class_name}}._getColValueByIdx(index, idx)
+        }
+        for(; idx < len; idx++) {
+            key = {{class_name}}.__key_list[idx]
+            record[key] = {{class_name}}.__default_value_list[idx]
+        }
+        return record
+    }
+
+    public static getSafe({{ typeAndIndex | join(", ") }}, cfg?: {{ record_name }} | Readonly<{{ record_name }}>): Readonly<{{ record_name }}> {
+        {% if indexOfColumns.length == 1 %}
+        let ret = {{ class_name }}.indexOf({{ class_name }}.__index_{{ indexOfColumns | join("_") }}[ {{ indexOfColumns | join(",") }} ], cfg)
+        if (!ret) {
+            throw new Error(`{{ class_name }} {{ indexOfColumns | join("_") }} ${ {{ indexOfColumns | join(",") }} } value is null`)
+        }
+        {% else %}
+        let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+        let ret =  {{ class_name }}.indexOf({{ class_name }}.__index_{{ indexOfColumns | join("_") }}[k], cfg)
+        if (!ret) {
+            throw new Error(`{{ class_name }} {{ indexOfColumns | join("_") }} ${k} value is null`)
+        }
+        {% endif %} 
+        return ret
+    }
+
+    public static get({{ typeAndIndex | join(", ") }}, cfg?: {{ record_name }} | Readonly<{{ record_name }}>): Readonly<{{ record_name }}> {
+        {% if indexOfColumns.length == 1 %}
+        return {{ class_name }}.indexOf({{ class_name }}.__index_{{ indexOfColumns | join("_") }}[ {{ indexOfColumns | join(",") }} ], cfg)
+        {% else %}
+        let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+        return {{ class_name }}.indexOf({{ class_name }}.__index_{{ indexOfColumns | join("_") }}[k], cfg)
+        {% endif %} 
+    }
+
+    private static _getColValueByKey(key: string | number, col: number): (string | number) {
+        let index = {{ class_name }}.__index_{{ indexOfColumns | join("_") }}[key]
+        let colValue = {{ class_name }}._getColValueByIdx(index, col)
+        return colValue
+    }
+    {% if enumStrDict %}
+    public static getStringByKey({{ typeAndIndex | join(", ") }}, valueIdx: {{enumStrDict.name}}, showError: boolean = false): string {
+        {% if indexOfColumns.length == 1 %}let k = {{ indexOfColumns | join(",") }}
+        {% else %}let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+        {% endif %} 
+        let colValue = {{ class_name }}._getColValueByKey(k, valueIdx)
+        if(colValue === null) {
+            if(showError) {
+                throw new Error(`{{ class_name }} ${k} rowCfg is null`)
+            } 
+            return null
+        }
+        return colValue as string
+    }
+
+    public static getStringByIdx(index: number, valueIdx: {{enumStrDict.name}}): string {
+        let colValue = {{ class_name }}._getColValueByIdx(index, valueIdx)
+        return colValue as string
+    }
+    {% endif %}
+
+    {% if enumNumDict %}
+    public static getNumberByKey({{ typeAndIndex | join(", ") }}, valueIdx: {{enumNumDict.name}}, showError: boolean = false): number {
+        {% if indexOfColumns.length == 1 %}let k = {{ indexOfColumns | join(",") }}
+        {% else %}let k = {{ indexOfColumns | join(" + \'_\' + ") }}
+        {% endif %} 
+        let colValue = {{ class_name }}._getColValueByKey(k, valueIdx)
+        if(colValue === null) {
+            if(showError) {
+                throw new Error(`{{ class_name }} ${k} rowCfg is null`)
+            } 
+            return null
+        }
+        return colValue as number
+    }
+
+    public static getNumberByIdx(index: number, valueIdx: {{enumNumDict.name}}): number {
+        let colValue = {{ class_name }}._getColValueByIdx(index, valueIdx)
+        return colValue as number
+    }
+    {% endif %}
+}

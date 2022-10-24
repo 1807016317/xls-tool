@@ -1,0 +1,66 @@
+using System.Collections.Generic;
+
+public class {{ record_name }} {
+{%- for item in needColumnsData %}
+    public {%if item.type == "int" %}int{% else %}string{% endif %} {{item.column}} {get; private set;} 
+{%- endfor %}
+    public {{ record_name}} ({%- for item in needColumnsData %}{%if item.type == "int" %}int{% else %}string{% endif %} {{item.column}}{%if not loop.last %},{% endif %}{%- endfor %}) {
+    {%- for item in needColumnsData %}
+        this.{{item.column}} = {{item.column}};
+    {%- endfor %} 
+    }
+}
+
+public class {{class_name}} {
+    private static List<{{record_name}}> __data = new List<{{record_name}}> {
+    {% for row in rowsData %}  
+        new {{record_name}}( {%- for k,v in row %}{{ v }}{%if not loop.last %},{% endif %}{% endfor -%} ),
+    {%- endfor %}
+    };
+
+    private static Dictionary<string, int> __index_{{ indexOfColumns | join("_") }} = new Dictionary<string, int> { {% for k, v in indexData %}  
+        { "{{k}}", {{v}} },
+    {%- endfor %}
+    };
+
+    {% if enums %}
+    {% for item in enums %}
+    public enum {{item.name}} {
+        {%- for unit in item.csharp_units %}
+        {{unit.key}} = {{unit.value}}, {{unit.des}}
+        {%- endfor %}
+    };
+    {% endfor %}
+    {% endif %}
+
+    {% if key_counts %}
+    {% for item in key_counts %}
+    public static int {{item.name}} = {{item.value}};
+    {% endfor %}
+    {% endif %}
+
+    public static int getLength() {
+        return __data.Count;
+    }
+
+    public static {{record_name}} indexOf(int index) {
+        if(index < 0 || index >= __data.Count) {
+            return null;
+        }
+
+        return __data[index];
+    }
+
+    public static {{record_name}} get({% for mainKey in mainKeyList %}{{mainKey.type}} {{mainKey.name}}{% if not loop.last %},{% endif %}{% endfor%}) {
+        {% if indexOfColumns.length == 1 %}
+        string key = {{ indexOfColumns | join(",") }} + "";
+        {% else %}
+        string key = {{ indexOfColumns | join(" + \"_\" + ") }};
+        {% endif %} 
+        if(__index{% for mainKey in mainKeyList %}_{{mainKey.name}}{% endfor%}.ContainsKey(key)) {
+            return indexOf(__index{% for mainKey in mainKeyList %}_{{mainKey.name}}{% endfor%}[key]);
+        } else {
+            return null;
+        }
+    }
+}
