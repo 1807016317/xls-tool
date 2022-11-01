@@ -2,8 +2,11 @@
  * @Author: 惊仙 
  * @Date: 2022-10-30 14:59:52 
  * @Last Modified by: 惊仙
- * @Last Modified time: 2022-10-30 20:18:01
+ * @Last Modified time: 2022-11-01 14:33:44
  */
+
+import Global from "./base/global";
+import exportPathSetPopup from "./prefabs/export-path-set-popup";
 
 const {ccclass, property} = cc._decorator;
 
@@ -29,7 +32,7 @@ export default class mainScene extends cc.Component {
     //window.electron = require('electron');
     start() {
         console.log("[cclog] enter mainScene")
-        this._electron = window['electron'];
+        this._electron = Global.instance.electron;
         this._ipcRenderer = this._electron.ipcRenderer;
         this._ipcRenderer.on('test1', (event, info, detail) => {
             console.log("test1_receive...", event, info, detail);
@@ -42,6 +45,11 @@ export default class mainScene extends cc.Component {
     // EVENTS
     public on_Pulgin_Check_Open(e: cc.Toggle) {
         // 插件检查开启控制
+    }
+
+    public on_Open_Change_Path() {
+        // 打开导出路径设置窗口
+        exportPathSetPopup.show()
     }
     // EVENTS END
 }

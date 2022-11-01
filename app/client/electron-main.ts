@@ -3,6 +3,7 @@ import { join } from 'path'
 import { ElectronChannel } from './ipc'
 import * as dotenv from "dotenv"
 import { JX } from './jx-define'
+import IpcEventCtrl from './ipc-event-ctrl'
 
 export const main = () => {
     loadEnv()
@@ -29,10 +30,11 @@ function onReady() {
 
 function mainWindowListens(mainWindow: BrowserWindow) {
     ipcMainHandles(mainWindow)
-    ipcMainOnS(mainWindow)
+    ipcMainOnEvent(mainWindow)
 }
 
-function ipcMainOnS(mainWindow: BrowserWindow) {
+function ipcMainOnEvent(mainWindow: BrowserWindow) {
+    IpcEventCtrl.instance.initDefaultEvents()
 }
 
 function ipcMainHandles(mainWindow: BrowserWindow) {
@@ -48,6 +50,8 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
             preload: join(__dirname, 'preload.js')
         }
     })
@@ -57,7 +61,7 @@ function createWindow() {
         const path = join(__dirname, 'dist', 'index.html')
         win.loadFile(path)
     } else if (JX.NODE_DEV) {
-        const path = join(__dirname, '../pages', 'index.html')
+        const path = join(__dirname, '../../web-desktop', 'index.html')
         console.log('path: ' + path)
         win.loadFile(path)
     }

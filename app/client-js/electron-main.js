@@ -6,6 +6,7 @@ const path_1 = require("path");
 const ipc_1 = require("./ipc");
 const dotenv = require("dotenv");
 const jx_define_1 = require("./jx-define");
+const ipc_event_ctrl_1 = require("./ipc-event-ctrl");
 const main = () => {
     loadEnv();
     onReady();
@@ -29,9 +30,10 @@ function onReady() {
 }
 function mainWindowListens(mainWindow) {
     ipcMainHandles(mainWindow);
-    ipcMainOnS(mainWindow);
+    ipcMainOnEvent(mainWindow);
 }
-function ipcMainOnS(mainWindow) {
+function ipcMainOnEvent(mainWindow) {
+    ipc_event_ctrl_1.default.instance.initDefaultEvents();
 }
 function ipcMainHandles(mainWindow) {
     electron_1.ipcMain.handle(ipc_1.ElectronChannel.openDialog, () => {
@@ -45,6 +47,8 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
             preload: (0, path_1.join)(__dirname, 'preload.js')
         }
     });
@@ -56,7 +60,7 @@ function createWindow() {
         win.loadFile(path);
     }
     else if (jx_define_1.JX.NODE_DEV) {
-        const path = (0, path_1.join)(__dirname, '../pages', 'index.html');
+        const path = (0, path_1.join)(__dirname, '../../web-desktop', 'index.html');
         console.log('path: ' + path);
         win.loadFile(path);
     }
