@@ -10,10 +10,10 @@ export default class LayerBase extends cc.Component {
     // LIFE-CYCLE CALLBACKS:
 
     // onLoad () {}
-    public static show(parent: cc.Node = null, showCall: (layer: LayerBase, node: cc.Node)=>void = null) {
+    public static show(params: any = null, parent: cc.Node = null, showCall: (layer: LayerBase, node: cc.Node)=>void = null) {
     }
 
-    public static doShow(path: string, parent: cc.Node = null, showCall: (layer: LayerBase, node: cc.Node)=>void = null) {
+    public static doShow(path: string, params: any, parent: cc.Node = null, showCall: (layer: LayerBase, node: cc.Node)=>void = null) {
         cc.resources.load(path, (error: Error, assets: cc.Asset)=>{
             if(error) {
                 cc.error(error)
@@ -30,7 +30,8 @@ export default class LayerBase extends cc.Component {
                 let layer = layerNode.getComponent(LayerBase)
                 if(layer) {
                     layer._initBlockClickedOn()
-                    layer.onInit()
+                    layer.onInit(params)
+                    showCall && showCall(layer, layerNode)
                 }
             }
         })
@@ -52,7 +53,7 @@ export default class LayerBase extends cc.Component {
         }
     }
 
-    protected onInit() {
+    protected onInit(params: any = null) {
 
     }
 

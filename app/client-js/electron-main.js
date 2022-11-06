@@ -44,7 +44,7 @@ function ipcMainHandles(mainWindow) {
 }
 function createWindow() {
     const win = new electron_1.BrowserWindow({
-        width: 800,
+        width: 830,
         height: 600,
         webPreferences: {
             nodeIntegration: true,

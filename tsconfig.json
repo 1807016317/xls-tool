@@ -6,7 +6,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "noImplicitAny": true,
-        "outDir": "app/client-js",
+        "outDir": "app/service-js",
         "paths": { },
         "removeComments": false,
         "sourceMap": true,
@@ -15,7 +15,7 @@
         "target": "esnext"
     },
     "include": [
-        "app", "app/client/.env",
+        "app", "app/service/.env",
     ],
     "exclude": [
         "node_modules",

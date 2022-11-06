@@ -1,0 +1,56 @@
+[
+  {
+    "setKey": "$1",
+    "setName": "默认",
+    "setDesc": "默认",
+    "settingList": [{
+      "id": "3",
+      "dir": "C:\\work\\Svn\\tools\\xlsxexporter\\test1",
+      "need": true,
+      "reg": "Client|Both|Lua",
+      "text": "lua"
+    },
+    {
+      "id": "4",
+      "dir": "C:\\work\\Svn\\tools\\xlsxexporter\\test1",
+      "need": false,
+      "reg": "Server|Both|Xml",
+      "text": "xml"
+    },
+    {
+      "id": "5",
+      "dir": "",
+      "need": false,
+      "reg": "Client|Both|Csv",
+      "text": "csv"
+    },
+    {
+      "id": "6",
+      "dir": "",
+      "need": false,
+      "reg": "Client|Both|Js",
+      "text": "js"
+    },
+    {
+      "id": "7",
+      "dir": "C:\\work\\Svn\\tools\\xlsxexporter\\test1",
+      "need": true,
+      "reg": "Client|Both|Ts",
+      "text": "ts"
+    },
+    {
+      "id": "8",
+      "dir": "C:\\work\\Svn\\tools\\xlsxexporter\\test1",
+      "need": true,
+      "reg": "Client|Both|C#",
+      "text": "c#"
+    },
+    {
+      "id": "9",
+      "dir": "",
+      "need": false,
+      "reg": "Client|Server|Both|ts",
+      "text": "gm"
+    }]
+  }
+]

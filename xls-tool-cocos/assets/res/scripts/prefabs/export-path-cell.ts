@@ -1,7 +1,6 @@
 import ElectronEventMgr from "../base/electron-event-mgr";
-import Global from "../base/global";
 import { exportPathInfo } from "../base/interface-define";
-import EventID from "../config/event-id";
+import ElectronEventID from "../config/event-id";
 
 const {ccclass, property} = cc._decorator;
 
@@ -31,6 +30,14 @@ export default class exportPathCell extends cc.Component {
             this._openDirNode.on(cc.Node.EventType.TOUCH_START, this.on_TOUCH_START, this)
             this._openDirNode.on(cc.Node.EventType.TOUCH_END, this.on_Open_Dir_Event, this)
             this._openDirNode.on(cc.Node.EventType.TOUCH_CANCEL, this.on_Open_Dir_Event, this)
+        }
+        let widget = this.node.getComponent(cc.Widget)
+        if(widget) {
+            widget.left = 10
+            widget.right = 10
+            widget.isAlignLeft = true
+            widget.isAlignRight = true
+            widget.updateAlignment()
         }
     }
 
@@ -65,9 +72,9 @@ export default class exportPathCell extends cc.Component {
     public on_Open_Dir_Event() {
         if(!this._hadOpenDir) {
             this._hadOpenDir = true
-            ElectronEventMgr.sendSync(EventID.c2s_open_dir, this._curDir)
-            this._openDirNode.scale = 1
+            ElectronEventMgr.send(ElectronEventID.c2s_open_dir, this._curDir, this._exportPathInfo.id)
         }
+        this._openDirNode.scale = 1
     }
 
     public on_TOUCH_START() {

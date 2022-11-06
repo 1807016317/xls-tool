@@ -24,4 +24,12 @@ export default class Global {
         }
         return this._winParent
     }
+
+    private _nodeFs: any = null
+    public get nodeFs(): any {
+        if(!this._nodeFs) {
+            this._nodeFs = window['fs']
+        }
+        return this._nodeFs
+    }
 }

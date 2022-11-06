@@ -1,6 +1,7 @@
 import ElectronEventMgr from "../base/electron-event-mgr";
-import SettingUtil from "../base/setting-util";
-import EventID from "../config/event-id";
+import { exportPathInfo, exportPathSetPopupEnter } from "../base/interface-define";
+import SettingMgr from "../base/setting-mgr";
+import ElectronEventID from "../config/event-id";
 import LayerBase from "./../base/layer-base";
 import exportPathCell from "./export-path-cell";
 
@@ -23,30 +24,55 @@ export default class exportPathSetPopup extends LayerBase {
 
     private _cellNodeList: cc.Node[] = []
     private _cellCompList: exportPathCell[] = []
+    private _outInfoList: exportPathInfo[] = []
+    private _outConfigIdx: number = 0
+    private _outConfigKey: string = ""
 
     // onLoad () {}
-    public static show(parent: cc.Node = null, showCall: (layer: LayerBase, node: cc.Node)=>void = null) {
-        this.doShow("prefabs/export-path-set-popup", parent, showCall)
+    public static show(params: exportPathSetPopupEnter, parent: cc.Node = null, showCall: (layer: exportPathSetPopup, node: cc.Node)=>void = null) {
+        if(!params) {
+            return
+        }
+        exportPathSetPopup.doShow("prefabs/export-path-set-popup", params, parent, showCall)
+    }
+    
+    onLoad () {
+        this._registerEvent()
     }
 
-    start () {
-        this._registerEvent()
+    protected onInit(params: exportPathSetPopupEnter) {
+        this._outConfigIdx = params.index
+        this._outConfigKey = params.setKey
         this._initScrollView()
     }
 
     private _registerEvent() {
-        ElectronEventMgr.on(EventID.s2c_open_dir, this.s2c_open_dir, this)
+        ElectronEventMgr.on(ElectronEventID.s2c_open_dir, this._s2c_open_dir.bind(this), this)
     }
 
-    private s2c_open_dir(event, dir: string) {
-        cc.log(event)
-        cc.log('[cclog] dir', dir)
+    private _s2c_open_dir(event, dir: string, id: number) {
+        console.log(event)
+        console.log(id, ' [cclog] dir', dir)
+        if(!this._outInfoList) {
+            return
+        }
+        let len = this._outInfoList.length
+        for (let i = 0; i < len; i++) {
+            let outInfo = this._outInfoList[i]
+            if(outInfo.id == id) {
+                outInfo.dir = dir
+                SettingMgr.instance.updateExportSetting(this._outConfigIdx, outInfo, this._outConfigKey)
+                this._cellCompList[i].onRefresh(outInfo)
+                break
+            }
+        }
     }
 
     private _initScrollView() {
         this._cellNodeList.length = 0
         this._cellCompList.length = 0
-        let outConfigList = SettingUtil.getExportSetting()
+        let outConfigList = SettingMgr.instance.getExportSetting(this._outConfigIdx, this._outConfigKey)
+        this._outInfoList.push(...outConfigList)
         let len = outConfigList.length
         for (let i = 0; i < len; i++) {
             let newNode = cc.instantiate(this._cellPrefab)
@@ -72,7 +98,7 @@ export default class exportPathSetPopup extends LayerBase {
             if(comp) {
                 let info = comp.getOutPathInfo()
                 if(info) {
-                    SettingUtil.updateExportSetting(info)
+                    SettingMgr.instance.updateExportSetting(this._outConfigIdx, info, this._outConfigKey)
                 }
             }
         }
