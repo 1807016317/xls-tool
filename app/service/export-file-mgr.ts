@@ -2,7 +2,7 @@
  * @Author: 惊仙 
  * @Date: 2021-03-10 18:10:47 
  * @Last Modified by: 惊仙
- * @Last Modified time: 2022-08-23 10:56:44
+ * @Last Modified time: 2022-11-08 20:49:52
  */
 
  // 导出成各种其他格式文件的方法
@@ -84,7 +84,7 @@
         return str
     }
     
-    public static ts_enum_upper(filename: string, needColumnsData) {
+    public static ts_enum_upper(filename: string, needColumnsData: any) {
         /* 这里有个问题没处理，无法判断是否是最上层的xlsx目录，
         当这里是配置表主目录时，配置表的名字中有和主目录文件夹的名字相同，也会把那一段删掉
         */
@@ -118,7 +118,7 @@
     }
 
     /**---------------------export function------------------------------- */
-    public static export_to_lua(parseResult, needColumns, needColumnsData, filename: string, setting) {
+    public static export_to_lua(parseResult: any, needColumns: any, needColumnsData: any, filename: string, setting: any) {
         let source = fs.readFileSync(path.join(__dirname, '../tmpl/lua.tmpl'), 'utf8')
     
     
@@ -200,7 +200,7 @@
     
     }
 
-    public static export_to_xml(parseResult, needColumns, needColumnsData, filename: string, setting) {
+    public static export_to_xml(parseResult: any, needColumns: any, needColumnsData: any, filename: string, setting: any) {
     
         let source = fs.readFileSync(path.join(__dirname, '../tmpl/xml.tmpl'), 'utf8')
     
@@ -237,7 +237,7 @@
         return output
     }
 
-    public static export_to_csv(parseResult, needColumns, needColumnsData, filename: string, setting) {
+    public static export_to_csv(parseResult: any, needColumns: any, needColumnsData: any, filename: string, setting: any) {
     
         let source = fs.readFileSync(path.join(__dirname, '../tmpl/csv.tmpl'), 'utf8')
     
@@ -265,7 +265,7 @@
         return output
     }
     
-    public static export_to_js(parseResult, needColumns, needColumnsData, filename: string, setting) {
+    public static export_to_js(parseResult: any, needColumns: any, needColumnsData: any, filename: string, setting: any) {
         let source = fs.readFileSync(path.join(__dirname, '../tmpl/js.tmpl'), 'utf8')
     
     
@@ -318,7 +318,7 @@
     
     }
     
-    public static export_to_ts(parseResult, needColumns, needColumnsData, filename: string, setting) {
+    public static export_to_ts(parseResult: any, needColumns: any, needColumnsData: any, filename: string, setting: any) {
         let tsTmpl = '../tmpl/ts.tmpl'
         if(!!xlsxData.get_project_cfg_by_key(xlsxData.PROJECT_UNIQUE.OLD_EXPORT_FORMAT)) {
             tsTmpl = '../tmpl/ts_old.tmpl'
@@ -402,7 +402,7 @@
     
     }
     
-    public static export_to_csharp(parseResult, needColumns, needColumnsData, filename: string, setting) {
+    public static export_to_csharp(parseResult: any, needColumns: any, needColumnsData: any, filename: string, setting: any) {
         let source = fs.readFileSync(path.join(__dirname, '../tmpl/csharp.tmpl'), 'utf8')
         let rowsData = []
     

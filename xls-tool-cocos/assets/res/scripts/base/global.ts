@@ -33,3 +33,18 @@ export default class Global {
         return this._nodeFs
     }
 }
+
+/**
+   "build": {  // 这里是electron-builder的配置
+        "productName":"xxxx",//项目名 这也是生成的exe文件的前缀名
+        "appId": "com.xxx.xxxxx",//包名  
+        "copyright":"xxxx",//版权  信息
+        "directories": { // 输出文件夹
+          "output": "build"
+        }, 
+        // windows相关的配置
+        "win": {  
+          "icon": "xxx/icon.ico"//图标路径 
+        }  
+      }
+ */

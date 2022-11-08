@@ -55,7 +55,7 @@ export default class XlsxService {
     }
     
     //解析xls, 获得表格内容和其他基本信息
-    public parse_xls(worksheet, parseResult: praseStruct, sheetName: string) {
+    public parse_xls(worksheet: any, parseResult: praseStruct, sheetName: string) {
     
         // parseResult = {
         //     maxRow: null,
@@ -542,7 +542,7 @@ export default class XlsxService {
     }
     
     // 插件脚本解析引入
-    public requirePlugin(parseResult: praseStruct, fileName: string, worksheet, needColumns, setting) {
+    public requirePlugin(parseResult: praseStruct, fileName: string, worksheet: any, needColumns: any, setting: any) {
         let PATH_NOW = path.resolve(__dirname, "../../plugin")
         let dirNameList = fs.readdirSync(PATH_NOW)
         let jsPluginList = []
@@ -611,7 +611,7 @@ export default class XlsxService {
         }
     }
     
-    public exportSwitch(parseResult: praseStruct, needColumns, needColumnsData, fileName: string, setting, outputs) {
+    public exportSwitch(parseResult: praseStruct, needColumns: any, needColumnsData: any, fileName: string, setting: any, outputs: any) {
         let output = ""
         switch (setting.text) {
             case "lua":

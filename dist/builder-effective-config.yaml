@@ -1,0 +1,46 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.electron.xlsx.tool
+copyright: '@jx0001'
+productName: xslx-tool
+nsis:
+  oneClick: false
+  language: '2052'
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+dmg:
+  background: ''
+  icon: ''
+  iconSize: 100
+  contents:
+    - x: 380
+      'y': 180
+      type: link
+      path: /Applications
+    - x: 130
+      'y': 180
+      type: file
+  window:
+    x: 100
+    'y': 100
+    width: 500
+    height: 300
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.utilities
+win:
+  icon: ''
+  target:
+    - target: nsis
+files:
+  - filter:
+      - build/**/*
+      - main.js
+      - public/preload.js
+extends: null
+electronVersion: 21.2.2

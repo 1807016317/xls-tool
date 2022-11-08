@@ -3,7 +3,7 @@ import ElectronEventID from "./event-id"
 const { ipcMain, dialog } = require('electron')
 
 export default class IpcEventCtrl {
-    private static _instance: IpcEventCtrl = null
+    private static _instance: IpcEventCtrl
     
     public static get instance(): IpcEventCtrl {
         if(!IpcEventCtrl._instance) {
